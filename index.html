@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather Warning</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; margin-top: 50px; }
+        button { padding: 10px 20px; font-size: 16px; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <h1>Weather Warning System</h1>
+    <button onclick="checkWeather()">Check Weather & Warning</button>
+    <p id="weather-info"></p>
+
+    <script>
+        const apiKey = '127fe5769ebe5237e7f7f9580a103943';
+        const city = 'Punjab'; // You can change this city
+
+        async function checkWeather() {
+            try {
+                const response = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=metric`);
+                const data = await response.json();
+                
+                const weatherDescription = data.weather[0].description;
+                const temp = data.main.temp;
+                
+                document.getElementById('weather-info').innerText = `Current weather in ${city}: ${weatherDescription}, Temp: ${temp}°C`;
+
+                let message = `Punjab mein mausam hai ${weatherDescription} aur taapman hai ${temp} degree Celsius.`;
+
+                if (weatherDescription.includes('rain')) {
+                    message += " Aaj baarish padegi, toh dopehar ko bahar mat nikalna.";
+                } else if (temp < 15) {
+                    message += " Aaj thand padegi, toh mote kapde paakar nikalna.";
+                } else if (temp > 35) {
+                    message += " Aaj garmi zyada hai, toh chhatri lekar nikalna.";
+                }
+
+                speakWarning(message);
+            } catch (error) {
+                console.error("Error fetching weather data:", error);
+                document.getElementById('weather-info').innerText = "Failed to fetch weather data.";
+            }
+        }
+
+        function speakWarning(text) {
+            const speech = new SpeechSynthesisUtterance(text);
+            speech.lang = 'hi-IN'; // Hindi/Hinglish accent
+            window.speechSynthesis.speak(speech);
+        }
+    </script>
+</body>
+</html>
